@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026双十一 · 报名算账器 | 日百家纺</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--green:#07C160;--green-dark:#06AD56;--green-light:#f0faf4;--red:#FA5151;--red-light:#fff1f0;--text:#333;--text2:#666;--text3:#999;--border:#e8e8e8;--bg:#f5f6fa;--card:#fff;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+.header{background:linear-gradient(135deg,var(--green) 0%,var(--green-dark) 100%);color:#fff;padding:40px 24px 36px;text-align:center}
+.header h1{font-size:22px;font-weight:700;letter-spacing:.5px;margin-bottom:4px}
+.header p{font-size:13px;opacity:.85}
+.container{max-width:680px;margin:-18px auto 0;padding:0 14px 24px;position:relative}
+.card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.card-title{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.card-title .ico{font-size:17px}
+.form-group{margin-bottom:14px}
+.form-group:last-child{margin-bottom:0}
+.form-label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;font-weight:500}
+.form-hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5}
+.sel-group{display:flex;gap:8px}
+.sel-item{flex:1;padding:10px 6px;border:2px solid var(--border);border-radius:8px;text-align:center;font-size:13px;cursor:pointer;transition:all .15s;background:#fafafa;line-height:1.35;user-select:none}
+.sel-item:hover{border-color:#b2dfdb}
+.sel-item.active{border-color:var(--green);background:var(--green-light);color:var(--green-dark);font-weight:600}
+.sel-item small{display:block;font-size:11px;color:var(--text3);font-weight:400;margin-top:2px}
+.sel-item.active small{color:var(--green)}
+.input-row{display:flex;align-items:center;gap:8px}
+.input-field{flex:1;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:15px;outline:none;transition:border-color .15s;width:100%;font-family:inherit;background:#fff}
+.input-field:focus{border-color:var(--green)}
+.input-unit{font-size:14px;color:var(--text3);white-space:nowrap;min-width:24px}
+select.input-field{appearance:none;-webkit-appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23999' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat right 12px center;padding-right:32px}
+.cvr-info{border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cvr-info.found{background:var(--green-light);color:var(--green-dark)}
+.cvr-info.notfound{background:#fff8e1;color:#e6a23c}
+.cvr-tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;white-space:nowrap;color:#fff}
+.cvr-tag.found{background:var(--green)}
+.cvr-tag.notfound{background:#e6a23c}
+.rtable{width:100%;border-collapse:collapse}
+.rtable th,.rtable td{padding:10px 12px;font-size:13px;border-bottom:1px solid #f3f3f3}
+.rtable th{background:#fafafa;font-weight:600;text-align:center;color:var(--text)}
+.rtable th:first-child{text-align:left;border-radius:6px 0 0 0}
+.rtable th:last-child{border-radius:0 6px 0 0}
+.rtable td:first-child{color:var(--text2);font-size:12px;white-space:nowrap}
+.rtable td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+.rtable tr:last-child td{border-bottom:none}
+.rtable .row-hl{background:var(--green-light);font-weight:600}
+.rtable .row-hl td{border-bottom-color:#d4edda}
+.pos{color:var(--green);font-weight:600}
+.neg{color:var(--red);font-weight:600}
+.zero-cost{color:var(--green);font-size:12px}
+.summary-box{margin-top:16px;border-radius:10px;padding:20px;text-align:center;transition:all .2s}
+.summary-box.pos-bg{background:linear-gradient(135deg,#f0faf4,#e8f5ec);border:1px solid #c8e6c9}
+.summary-box.neg-bg{background:var(--red-light);border:1px solid #ffcdd2}
+.sum-label{font-size:13px;color:var(--text2)}
+.sum-value{font-size:30px;font-weight:700;margin:4px 0;font-variant-numeric:tabular-nums;transition:color .2s}
+.sum-detail{font-size:12px;color:var(--text3);margin-top:2px}
+.toggle-hd{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between}
+.toggle-hd .arr{font-size:12px;transition:transform .2s;color:var(--text3)}
+.toggle-hd.open .arr{transform:rotate(90deg)}
+.collapse{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.collapse.open{max-height:900px}
+.total-card{border-radius:var(--radius);padding:24px;text-align:center;margin-bottom:12px;color:#fff;transition:background .3s}
+.total-card.pos-card{background:linear-gradient(135deg,var(--green),var(--green-dark))}
+.total-card.neg-card{background:linear-gradient(135deg,#FA5151,#d32f2f)}
+.total-label{font-size:14px;opacity:.88}
+.total-value{font-size:34px;font-weight:700;margin:6px 0;font-variant-numeric:tabular-nums}
+.total-detail{font-size:12px;opacity:.72}
+.footer{text-align:center;padding:16px;font-size:11px;color:#ccc;line-height:1.7}
+.note-box{background:#fffbe6;border:1px solid #ffe58f;border-radius:8px;padding:10px 14px;font-size:12px;color:#ad8b00;margin-top:12px;line-height:1.6}
+@media(max-width:420px){.sel-group{gap:6px}.sel-item{padding:8px 4px;font-size:12px}.rtable th,.rtable td{padding:8px 6px;font-size:12px}.container{padding:0 10px 20px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>2026 双十一 · 报名算账器</h1>
+  <p>日百家纺行业 — 算清楚再报名，报了名更赚钱</p>
+</div>
+
+<div class="container">
+
+  <!-- 基础信息 -->
+  <div class="card">
+    <div class="card-title"><span class="ico">📋</span> 基础信息</div>
+    <div class="form-group">
+      <label class="form-label">选择行业</label>
+      <div class="sel-group" id="grpIndustry">
+        <div class="sel-item active" data-v="居家日用" onclick="pick('industry',this)">居家日用</div>
+        <div class="sel-item" data-v="家纺" onclick="pick('industry',this)">家纺</div>
+        <div class="sel-item" data-v="厨具" onclick="pick('industry',this)">厨具</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">商家身份</label>
+      <div class="sel-group" id="grpIdentity">
+        <div class="sel-item active" data-v="普通商家" onclick="pick('identity',this)">普通商家<small>混资券·12.5%优惠</small></div>
+        <div class="sel-item" data-v="好店商家" onclick="pick('identity',this)">好店商家<small>全资券·12.5%优惠</small></div>
+        <div class="sel-item" data-v="品牌好店" onclick="pick('identity',this)">品牌好店<small>品类加补·16.7%优惠</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 商品信息 -->
+  <div class="card">
+    <div class="card-title"><span class="ico">🏷️</span> 商品信息</div>
+    <div class="form-group">
+      <label class="form-label">商品标价</label>
+      <div class="input-row">
+        <input type="number" class="input-field" id="inPrice" value="200" oninput="calc()">
+        <span class="input-unit">元</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">每单成本（货+邮）</label>
+      <div class="input-row">
+        <input type="number" class="input-field" id="inCost" value="70" oninput="calc()">
+        <span class="input-unit">元</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">广告转化成本/单</label>
+      <div class="input-row">
+        <input type="number" class="input-field" id="inAdCost" value="65" oninput="calc()">
+        <span class="input-unit">元</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">日销量基线</label>
+      <div class="input-row">
+        <input type="number" class="input-field" id="inSales" value="1000" oninput="calc()">
+        <span class="input-unit">单</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 算账结果 -->
+  <div class="card">
+    <div class="card-title"><span class="ico">📊</span> 算账结果</div>
+    <div class="cvr-info found" id="cvrBox">
+      <span class="cvr-tag found" id="cvrTag">CVR +50.2%</span>
+      <span id="cvrText">居家日用 · 100-200元档</span>
+    </div>
+    <table class="rtable">
+      <thead><tr><th style="width:34%">项目</th><th>不报活动</th><th id="colHd">报活动（混资券）</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div id="sumBox" class="summary-box pos-bg"></div>
+    <div id="noteBox"></div>
+  </div>
+
+  <!-- 成长卡 -->
+  <div class="card">
+    <div class="card-title toggle-hd" id="gcToggle" onclick="toggleGC()">
+      <span><span class="ico">🎯</span> 直播大场激励（成长卡加算）</span>
+      <span class="arr">▶</span>
+    </div>
+    <div class="collapse" id="gcBody">
+      <div style="padding-top:16px">
+        <div class="form-group">
+          <label class="form-label">大场预估有效GMV</label>
+          <div class="input-row">
+            <input type="number" class="input-field" id="inGmv" value="25" oninput="calc()">
+            <span class="input-unit">万元</span>
+          </div>
+          <div class="form-hint">有效GMV = 支付GMV − T+7退款 − 异常订单</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">跃迁激励（首次突破门槛）</label>
+          <select class="input-field" id="inLeap" onchange="calc()">
+            <option value="0">不适用 / 已突破过</option>
+            <option value="50">首次突破 50万 → 3,000点</option>
+            <option value="100">首次突破 100万 → 10,000点</option>
+            <option value="300">首次突破 300万 → 20,000点</option>
+            <option value="1000">首次突破 1,000万 → 30,000点</option>
+            <option value="3000">首次突破 3,000万 → 50,000点</option>
+            <option value="10000">首次突破 1亿 → 80,000点</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">成长卡投流ROI预估</label>
+          <div class="input-row">
+            <input type="number" class="input-field" id="inRoi" value="3" step="0.1" oninput="calc()">
+            <span class="input-unit">倍</span>
+          </div>
+        </div>
+        <div id="gcResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 总计 -->
+  <div class="total-card pos-card" id="totalCard">
+    <div class="total-label">报名双十一，每日预估增收</div>
+    <div class="total-value" id="totalVal">+0元</div>
+    <div class="total-detail" id="totalDet"></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  数据来源：微信小店 2026年11.11大促活动规则<br>
+  CVR为行业历史参考值，实际效果可能有差异 · 成长卡规则以平台最新公告为准<br>
+  腾讯营销 · 消电日百中心
+</div>
+
+<script>
+// ========== 数据 ==========
+var CVR = {
+  '居家日用': [
+    {lo:0,hi:50,cvr:14.6,lb:'0-50元'},
+    {lo:50,hi:100,cvr:34.3,lb:'50-100元'},
+    {lo:100,hi:200,cvr:25.2,lb:'100-200元'},
+    {lo:200,hi:500,cvr:47.4,lb:'200-500元'}
+  ],
+  '家纺': [
+    {lo:0,hi:50,cvr:25.6,lb:'0-50元'},
+    {lo:50,hi:100,cvr:24,lb:'50-100元'},
+    {lo:100,hi:200,cvr:15.5,lb:'100-200元'},
+    {lo:200,hi:500,cvr:19.7,lb:'200-500元'},
+    {lo:500,hi:1e9,cvr:14.7,lb:'500元以上'}
+  ],
+  '厨具': [
+    {lo:0,hi:50,cvr:2.1,lb:'0-50元'},
+    {lo:50,hi:100,cvr:19.1,lb:'50-100元*'},
+    {lo:100,hi:200,cvr:36.1,lb:'100-200元'},
+    {lo:200,hi:500,cvr:52.2,lb:'200-500元'},
+    {lo:500,hi:1e9,cvr:21,lb:'500元以上'}
+  ]
+};
+
+var GC_TIERS = [
+  {lo:10,hi:50,br:0.012,or:0.01},
+  {lo:50,hi:100,br:0.014,or:0.01},
+  {lo:100,hi:300,br:0.016,or:0.01},
+  {lo:300,hi:1000,br:0.02,or:0.01},
+  {lo:1000,hi:3000,br:0.025,or:0.01},
+  {lo:3000,hi:1e9,br:0.03,or:0.01}
+];
+
+var LEAP = {50:3000,100:10000,300:20000,1000:30000,3000:50000,10000:80000};
+var BC=900000, OC=300000, P2Y=0.1;
+
+var DISCOUNT = {
+  '普通商家': {rate:0.125,mcr:0.0625,lb:'混资券',hd:'报活动（混资券）'},
+  '好店商家': {rate:0.125,mcr:0,lb:'全资券',hd:'报活动（全资券）'},
+  '品牌好店': {rate:0.167,mcr:0,lb:'品类加补',hd:'报活动（品类加补）'}
+};
+
+// ========== 状态 ==========
+var S = {industry:'居家日用', identity:'普通商家'};
+var gcOpen = false;
+
+// ========== 工具 ==========
+function $(id){return document.getElementById(id)}
+function v(id){return parseFloat($(id).value)||0}
+function fmt(n,d){
+  if(isNaN(n)||!isFinite(n)) return '—';
+  d=d||0;
+  return n.toLocaleString('zh-CN',{minimumFractionDigits:d,maximumFractionDigits:d});
+}
+function sign(n,d){return (n>=0?'+':'')+fmt(n,d)}
+
+// ========== 选择器 ==========
+function pick(type,el){
+  el.parentElement.querySelectorAll('.sel-item').forEach(function(e){e.classList.remove('active')});
+  el.classList.add('active');
+  S[type]=el.dataset.v;
+  calc();
+}
+
+function toggleGC(){
+  gcOpen=!gcOpen;
+  $('gcToggle').classList.toggle('open',gcOpen);
+  $('gcBody').classList.toggle('open',gcOpen);
+  calc();
+}
+
+// ========== CVR查找 ==========
+function findCVR(ind,price){
+  var tiers=CVR[ind];
+  if(!tiers||price<=0) return {cvr:0,lb:'—',ok:false};
+  for(var i=0;i<tiers.length;i++){
+    if(price>tiers[i].lo && price<=tiers[i].hi) return {cvr:tiers[i].cvr,lb:tiers[i].lb,ok:true};
+  }
+  var last=tiers[tiers.length-1];
+  if(price>last.hi) return {cvr:last.cvr,lb:last.lb+'（参考）',ok:true};
+  return {cvr:0,lb:'暂无数据',ok:false};
+}
+
+// ========== 成长卡 ==========
+function calcGC(gmvW){
+  if(gmvW<10) return {bp:0,op:0,lp:0};
+  var yuan=gmvW*10000, tier=null;
+  for(var i=0;i<GC_TIERS.length;i++){
+    if(gmvW>=GC_TIERS[i].lo && gmvW<GC_TIERS[i].hi){tier=GC_TIERS[i];break}
+  }
+  if(gmvW>=3000) tier=GC_TIERS[GC_TIERS.length-1];
+  if(!tier) return {bp:0,op:0,lp:0};
+  var bp=Math.min(yuan*tier.br,BC);
+  var op=Math.min(yuan*tier.or,OC);
+  var lv=parseInt($('inLeap').value)||0;
+  var lp=LEAP[lv]||0;
+  return {bp:bp,op:op,lp:lp};
+}
+
+// ========== 核心计算 ==========
+function calc(){
+  var price=v('inPrice'), cost=v('inCost'), adCost=v('inAdCost'), sales=v('inSales');
+  var ind=S.industry, ident=S.identity;
+  var c=findCVR(ind,price);
+  var d=DISCOUNT[ident];
+  var cvr=c.cvr/100;
+
+  // CVR展示
+  var cvrBox=$('cvrBox'), cvrTag=$('cvrTag'), cvrText=$('cvrText');
+  if(c.ok){
+    cvrBox.className='cvr-info found';
+    cvrTag.className='cvr-tag found';
+    cvrTag.textContent='CVR +'+c.cvr+'%';
+    cvrText.textContent=ind+' · '+c.lb+'档';
+  } else {
+    cvrBox.className='cvr-info notfound';
+    cvrTag.className='cvr-tag notfound';
+    cvrTag.textContent='CVR —';
+    cvrText.textContent=price<=0?'请输入商品标价':'该价格档暂无CVR数据';
+  }
+
+  // 列标题
+  $('colHd').textContent=d.hd;
+
+  // 基线
+  var bProfit=price-cost-adCost;
+  var bSales=sales;
+  var bDaily=bProfit*bSales;
+
+  // 报活动
+  var coupon=price*d.rate;
+  var mCost=price*d.mcr;
+  var mRecv=price-mCost;
+  var rProfit=mRecv-cost-adCost;
+  var rSales=Math.round(sales*(1+cvr));
+  var rDaily=rProfit*rSales;
+
+  var diff=rDaily-bDaily;
+  var pct=bDaily!==0?(diff/bDaily*100):0;
+
+  // 表格
+  var userPrice=price*(1-d.rate);
+  var mCostCell=mCost>0?fmt(mCost,1)+'元':'<span class="zero-cost">0元（平台全担）</span>';
+  var mRecvCls=(ident!=='普通商家')?' class="pos"':'';
+
+  var rows=[
+    ['商品标价',fmt(price)+'元',fmt(price)+'元',''],
+    ['用户到手价',fmt(price)+'元',fmt(userPrice,1)+'元',''],
+    ['券优惠金额','—',fmt(coupon,1)+'元',''],
+    ['商家券成本/单','—',mCostCell,''],
+    ['商家到手/单',fmt(price)+'元','<span'+mRecvCls+'>'+fmt(mRecv,1)+'元</span>',''],
+    ['单品利润',fmt(bProfit,1)+'元',fmt(rProfit,1)+'元',''],
+    ['CVR提升','—',c.ok?'<span class="pos">+'+c.cvr+'%</span>':'—',''],
+    ['日销量',fmt(bSales)+'单',fmt(rSales)+'单',''],
+    ['日销售利润',fmt(bDaily,0)+'元',fmt(rDaily,0)+'元','hl']
+  ];
+
+  var html='';
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var trCls=r[3]==='hl'?' class="row-hl"':'';
+    html+='<tr'+trCls+'><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>';
+  }
+  $('tbody').innerHTML=html;
+
+  // 摘要
+  var isP=diff>=0;
+  var sb=$('sumBox');
+  sb.className='summary-box '+(isP?'pos-bg':'neg-bg');
+  var extra='';
+  if(ident==='普通商家'){
+    extra='单品让利'+fmt(mCost,1)+'元/单，CVR提升带来增量弥补';
+  } else if(ident==='品牌好店'){
+    extra='平台全额补贴+16.7%大额优惠，0成本撬动增量';
+  } else {
+    extra='平台全额补贴，0成本纯享CVR增量';
+  }
+  sb.innerHTML='<div class="sum-label">报名后每日利润变化</div>'
+    +'<div class="sum-value" style="color:'+(isP?'var(--green)':'var(--red)')+'">'+sign(diff,0)+'元</div>'
+    +'<div class="sum-detail">较基线 '+sign(pct,1)+'% · '+extra+'</div>';
+
+  // 品牌好店备注
+  var nb=$('noteBox');
+  if(ident==='品牌好店'){
+    nb.innerHTML='<div class="note-box">💡 品类加补提供16.7%优惠力度（高于基础12.5%），消费者实际转化可能高于上述CVR参考值，实际增收大概率优于测算结果。</div>';
+  } else {
+    nb.innerHTML='';
+  }
+
+  // ========== 成长卡 ==========
+  var gmvW=v('inGmv'), roi=v('inRoi');
+  var gc=calcGC(gmvW);
+  var totalPts=gc.bp+gc.op+gc.lp;
+  var adBudget=totalPts*P2Y;
+  var exGMV=adBudget*roi;
+  var exOrders=price>0?Math.floor(exGMV/price):0;
+  var profitNoAd=mRecv-cost;
+  var exProfit=exOrders*profitNoAd;
+
+  var gcEl=$('gcResult');
+  if(gmvW>=10){
+    gcEl.innerHTML='<div style="margin-top:12px;padding-top:12px;border-top:1px solid #eee">'
+      +'<table class="rtable"><tbody>'
+      +'<tr><td>基础激励（'+findGCRate(gmvW)+'）</td><td style="text-align:right">'+fmt(gc.bp,0)+'点</td></tr>'
+      +'<tr><td>叠加激励（1%）</td><td style="text-align:right">'+fmt(gc.op,0)+'点</td></tr>'
+      +'<tr><td>跃迁激励</td><td style="text-align:right">'+fmt(gc.lp,0)+'点</td></tr>'
+      +'<tr class="row-hl"><td>成长卡合计</td><td style="text-align:right">'+fmt(totalPts,0)+'点 ≈ '+fmt(adBudget,0)+'元</td></tr>'
+      +'<tr><td>投流带来额外GMV</td><td style="text-align:right">'+fmt(adBudget,0)+' × '+roi+' = '+fmt(exGMV,0)+'元</td></tr>'
+      +'<tr><td>额外订单（0广告费）</td><td style="text-align:right">≈'+fmt(exOrders,0)+'单</td></tr>'
+      +'<tr class="row-hl"><td>成长卡额外利润</td><td style="text-align:right;color:var(--green);font-weight:600">+'+fmt(exProfit,0)+'元</td></tr>'
+      +'</tbody></table>'
+      +'<div class="form-hint" style="margin-top:8px">成长卡为免费投流额度，1点≈0.1元 · 需大场满减商品GMV占比≥50%方可获叠加激励</div>'
+      +'</div>';
+  } else {
+    gcEl.innerHTML='<div style="margin-top:12px;padding:14px;background:#fafafa;border-radius:8px;font-size:13px;color:var(--text3);text-align:center">'
+      +'大场有效GMV需≥10万方可获得成长卡激励</div>';
+  }
+
+  // ========== 总计 ==========
+  var gcExtra=gcOpen&&gmvW>=10?exProfit:0;
+  var total=diff+gcExtra;
+  var tIsP=total>=0;
+  $('totalCard').className='total-card '+(tIsP?'pos-card':'neg-card');
+  $('totalVal').textContent=sign(total,0)+'元/天';
+  var parts=['日销利润差额 '+sign(diff,0)+'元'];
+  if(gcOpen&&gmvW>=10) parts.push('成长卡增收 +'+fmt(gcExtra,0)+'元');
+  $('totalDet').textContent=parts.join(' ＋ ');
+}
+
+function findGCRate(gmvW){
+  for(var i=0;i<GC_TIERS.length;i++){
+    if(gmvW>=GC_TIERS[i].lo && gmvW<GC_TIERS[i].hi) return (GC_TIERS[i].br*100)+'%';
+  }
+  return '3%';
+}
+
+// 初始化
+calc();
+</script>
+</body>
+</html>
